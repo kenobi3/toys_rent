@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\User;
+use App\Models\Cities;
 use Illuminate\Http\Request;
+use Auth;
 
 class CompanyController extends Controller
 {
@@ -16,7 +18,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
-		$companies=Company::orderBy('name','ASC')->get();
+		$companies=Company::with('user','city')->orderBy('name','ASC')->paginate(10);
+		
+		//dd ($companies);
         return view('admin.company.index',['companies'=>$companies]);
     }
 
@@ -27,7 +31,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-		$users=User::orderBy('name','ASC')->get();
+		$users=User::orderBy('name','ASC')->whereNotIn('id',Company::select('user_id')->get())->get();
         return view('admin.company.create',['users'=>$users]);
     }
 
@@ -57,7 +61,8 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        //
+		//dd($company);
+        return view('admin.company.show',['company'=>$company]);
     }
 
     /**
@@ -68,7 +73,7 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        //
+        return view('admin.company.edit',['company'=>$company]);
     }
 
     /**
@@ -80,7 +85,27 @@ class CompanyController extends Controller
      */
     public function update(Request $request, Company $company)
     {
-        //
+		$company->name=$request->name;
+		$company->opis=$request->opis;
+		$company->contacts=$request->contacts;
+		$company->save();
+		
+		return redirect()->route('company.index')->withSuccess('Компания '.$company->name.' успешно изменена');
+    }
+	
+	public function block($idc, $sts)
+    {
+		$company=Company::find($idc);
+		$company->block=$sts;
+		$company->save();
+		
+		if ($sts==1) {
+			$action_txt='заблокирована';
+		} else {
+			$action_txt='разблокирована';
+		}
+		
+		return redirect()->route('company.show',$idc)->withSuccess('Компания '.$company->name.' успешно '.$action_txt);
     }
 
     /**
@@ -91,6 +116,14 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
-        //
+		if(Cities::where('company_id','=',$company->id)->count()!=0)
+		{
+			return redirect()->route('company.index')->withErrors('Компания '.$company->name.' не может быть удалена, так как она имеется в городе '.$company->city->name.'!');
+		}
+		
+		/// добавить проверку на товары и тд, всю информацию, которая может быть отнесена к компании
+	
+		$company->delete();
+        return redirect()->route('company.index')->withSuccess('Компания '.$company->name.' успешно удалена!');
     }
 }

@@ -5,11 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cities extends Model
+class Category extends Model
 {
     use HasFactory;
-	
-	public function company(){
-		return $this->belongsTo('App\Models\Company','company_id');
-	}
 }

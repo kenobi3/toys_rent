@@ -42,4 +42,23 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+	
+	public function company(){
+		return $this->belongsTo('App\Models\Company','id','user_id');
+	}
+	
+	public function getCompanyIDAttribute()
+	{
+		if ($this->hasRole('admin|manager|root')){
+			if ($this->hasRole('admin|root')) {
+				// выводим ид компании головный где пользователь главный
+				return $this->company->id;
+			} else {
+				// надо выводить ид компании где пользователь менеджером является
+				return -1;
+			}
+		} else {
+			return 0;
+		}
+	}
 }

@@ -14,13 +14,9 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes(['verify' => true]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
@@ -35,10 +31,14 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 
 Route::middleware(['role:root|admin|manager'])->prefix('admin_panel')->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\HomeController::class, 'index'])->name('admin.index');
+	Route::resource('category', App\Http\Controllers\Admin\CategoriesController::class);
+	Route::resource('product', App\Http\Controllers\Admin\ProductsController::class);
 });
 
 Route::middleware(['role:root'])->prefix('admin_panel')->group(function () {
     Route::resource('company', App\Http\Controllers\Admin\CompanyController::class);
+    Route::get('company/block/{id}/{sts}', [App\Http\Controllers\Admin\CompanyController::class,'block'])->name('company.block');
+	Route::resource('city', App\Http\Controllers\Admin\CitiesController::class);
 });
 
 

@@ -1,3 +1,8 @@
+<?php
+$user=Auth::user();
+?>
+
+
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -58,10 +63,15 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+									@if($user->hasRole('root|admin|manager'))
+									<a class="dropdown-item" href="{{ route('admin.index') }}">
+                                        Панель управления
+                                    </a>
+									@endif
+								
                                     <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                       onclick="if (confirm('Хотите выйти?')){event.preventDefault(); document.getElementById('logout-form').submit();} else {return false;};">
+                                        Выход
                                     </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
