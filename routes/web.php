@@ -17,6 +17,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 Auth::routes(['verify' => true]);
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/redirect/{id}', [App\Http\Controllers\RedirectController::class, 'redirect'])->name('redirect');
 
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
@@ -25,7 +26,7 @@ Route::get('/email/verify', function () {
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
 
-    return redirect('/home');
+    return redirect('/');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 
@@ -33,6 +34,7 @@ Route::middleware(['role:root|admin|manager'])->prefix('admin_panel')->group(fun
     Route::get('/', [App\Http\Controllers\Admin\HomeController::class, 'index'])->name('admin.index');
 	Route::resource('category', App\Http\Controllers\Admin\CategoriesController::class);
 	Route::resource('product', App\Http\Controllers\Admin\ProductsController::class);
+	Route::resource('qrcodes', App\Http\Controllers\Admin\QRCodesController::class);
 });
 
 Route::middleware(['role:root'])->prefix('admin_panel')->group(function () {

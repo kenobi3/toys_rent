@@ -151,6 +151,16 @@ $user=Auth::user();
               </p>
             </a>
           </li>
+		  @if(!$user->hasRole('root'))
+			<li class="nav-item">
+				<a href="{{ route('qrcodes.index') }}" class="nav-link">
+				  <i class="nav-icon fas fa-layer-group"></i>
+				  <p>
+					QR коды
+				  </p>
+				</a>
+			  </li>  
+		  @endif
 		  @if($user->hasRole('root'))
 		  <li class="nav-header">АМИНИСТРИРОВАНИЕ</li>
 		  <li class="nav-item">
